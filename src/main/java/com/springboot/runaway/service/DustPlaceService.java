@@ -1,10 +1,10 @@
 package com.springboot.runaway.service;
 
 import com.springboot.runaway.dto.DustPlaceDto;
+import com.springboot.runaway.converter.TMCoordinateConverter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Comparator;
 import java.util.List;
@@ -50,6 +50,11 @@ public class DustPlaceService {
             dto.setWdUtztnHrm((String) row.get("WD_UTZTN_HRM"));
             dto.setXcrd(Double.parseDouble(row.get("XCRD").toString()));
             dto.setYcrd(Double.parseDouble(row.get("YCRD").toString()));
+            double[] latlon = TMCoordinateConverter.toWGS84(dto.getXcrd(), dto.getYcrd());
+            dto.setLatitude(latlon[0]);
+            dto.setLongitude(latlon[1]);
+            System.out.println("🔥🔥 변환 전 TM좌표: " + dto.getXcrd() + ", " + dto.getYcrd());
+            System.out.println("🔥🔥 변환 후 위경도: " + latlon[0] + ", " + latlon[1]);
             return dto;
         }).collect(Collectors.toList());
     }
@@ -59,8 +64,8 @@ public class DustPlaceService {
 
         return list.stream().map(dto -> {
                     double dist = calculateHaversineDistance(
-                            longitude, latitude, // 현재 위치
-                            tmToLongitude(dto.getXcrd()), tmToLatitude(dto.getYcrd()) // 대피소 위경도로 변환 후 거리 계산
+                            longitude, latitude,
+                            dto.getLongitude(), dto.getLatitude()
                     );
                     dto.setDistance(dist);
                     return dto;
@@ -68,21 +73,13 @@ public class DustPlaceService {
                 .collect(Collectors.toList());
     }
 
-    private double tmToLongitude(double x) {
-        return ((x - 200000) / 88000.0) + 127.0;
-    }
-
-    private double tmToLatitude(double y) {
-        return ((y - 500000) / 111000.0) + 37.0;
-    }
-
     private double calculateHaversineDistance(double lon1, double lat1, double lon2, double lat2) {
-        double R = 6371.0; // 지구 반지름 (km)
+        double R = 6371.0;
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) *
-                        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return Math.round(R * c * 10) / 10.0;
     }

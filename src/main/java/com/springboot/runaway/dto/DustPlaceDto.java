@@ -32,6 +32,12 @@ public class DustPlaceDto {
     @Schema(description = "현재 위치로부터 거리 (km)", example = "1.2")
     private double distance;
 
+    @Schema(description = "위도", example = "37.5665")
+    private double latitude;
+
+    @Schema(description = "경도", example = "126.9780")
+    private double longitude;
+
     public DustPlaceDto() {
     }
 
@@ -117,5 +123,21 @@ public class DustPlaceDto {
 
     public void setDistance(double distance) {
         this.distance = distance;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }
