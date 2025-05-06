@@ -55,11 +55,8 @@ public class EarthquakePlaceService {
             dto.setDongNm((String) row.get("SGG_NM"));               // 구 이름
             dto.setFcltNm((String) row.get("ACTC_FCLT_NM"));        // 시설 이름
             dto.setAddr((String) row.get("DADDR"));                 // 전체 주소
-            dto.setFcltType("");  // 이 데이터셋엔 타입 필드 없음
-            dto.setUtztnPsbltyNope(""); // 수용인원 필드도 없음
-            dto.setWdUtztnHrm("");  // 운영시간 필드도 없음
-            dto.setXcrd(parseDoubleSafe(row, "XCRD"));              // TM X 좌표
-            dto.setYcrd(parseDoubleSafe(row, "YCRD"));              // TM Y 좌표
+            dto.setLongitude(parseDoubleSafe(row, "LOT"));    // TM X 좌표
+            dto.setLatitude(parseDoubleSafe(row, "LAT"));     // TM Y 좌표
             return dto;
         }).collect(Collectors.toList());
     }
@@ -72,7 +69,7 @@ public class EarthquakePlaceService {
                 .map(dto -> {
                     double dist = calculateHaversineDistance(
                             lon, lat,
-                            tmToLon(dto.getXcrd()), tmToLat(dto.getYcrd())
+                            tmToLon(dto.getLongitude()), tmToLat(dto.getLatitude())
                     );
                     dto.setDistance(dist);
                     return dto;

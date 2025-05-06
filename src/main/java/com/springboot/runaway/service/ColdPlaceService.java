@@ -66,8 +66,9 @@ public class ColdPlaceService {
                             (wdOpen != null && wdEnd != null ? "~" : "") +
                             (wdEnd != null ? wdEnd : "")
             );
-            dto.setLongitude(parseDoubleSafe(row, "LOT"));
-            dto.setLatitude(parseDoubleSafe(row, "LAT"));
+            dto.setLatitude(parseDoubleSafe(row, "LOT"));
+            dto.setLongitude(parseDoubleSafe(row, "LAT"));
+
             return dto;
         }).collect(Collectors.toList());
     }
